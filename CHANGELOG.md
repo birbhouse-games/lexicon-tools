@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/birbhouse-games/lexicon-tools/compare/v1.1.2...v1.2.0) (2026-02-03)
+
+
+### Bug Fixes
+
+* Shorten description to meet Marketplace requirements ([4f97c35](https://github.com/birbhouse-games/lexicon-tools/commit/4f97c3593bc079c0a68424b793bc859155291f9a))
+
+
+### Features
+
+* Add root action.yml for Marketplace listing ([9f6925a](https://github.com/birbhouse-games/lexicon-tools/commit/9f6925a0665ed2ed2ae9d66dfa23737777aad5e9))
+
 ## [1.1.2](https://github.com/birbhouse-games/lexicon-tools/compare/v1.1.1...v1.1.2) (2026-02-03)
 
 
