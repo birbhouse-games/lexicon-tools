@@ -164,7 +164,7 @@ case "$COMMAND" in
         echo "::group::Checking DNS records for DID: $DID"
 
         # shellcheck disable=SC2086
-        if ! RESULT=$(goat lex check-dns $LEXICON_ARGS --did "$DID" 2>&1); then
+        if ! RESULT=$(goat lex check-dns $LEXICON_ARGS --example-did "$DID" 2>&1); then
             HAS_ERRORS="true"
             EXIT_CODE=1
         fi
