@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/birbhouse-games/lexicon-tools/compare/v1.1.0...v1.1.1) (2026-02-03)
+
+
+### Bug Fixes
+
+* **lint:** Don't treat goat exit code as error indicator ([ed00391](https://github.com/birbhouse-games/lexicon-tools/commit/ed0039179444df150585dbaa93687c520bc1ef91))
+
 # [1.1.0](https://github.com/birbhouse-games/lexicon-tools/compare/v1.0.0...v1.1.0) (2026-02-03)
 
 
