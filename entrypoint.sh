@@ -1,9 +1,17 @@
 #!/bin/bash
 set -e
 
-# Function to output to GitHub Actions
+# Function to output to GitHub Actions (handles multiline values)
 output() {
-    echo "$1=$2" >> "$GITHUB_OUTPUT"
+    local name="$1"
+    local value="$2"
+
+    # Use heredoc syntax for multiline values
+    {
+        echo "${name}<<EOF"
+        echo "$value"
+        echo "EOF"
+    } >> "$GITHUB_OUTPUT"
 }
 
 # Function to set error message and exit
