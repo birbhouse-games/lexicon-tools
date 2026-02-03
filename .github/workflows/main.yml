@@ -242,13 +242,23 @@ jobs:
             echo "major=$(echo "$VERSION" | cut -d. -f1)" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check for workflow changes
+        id: workflow-changes
+        run: |
+          # Get the previous major version tag
+          PREV_TAG="v${{ steps.version.outputs.major }}"
+          # Check if any workflow files changed since the previous tag
+          if git diff --name-only "$PREV_TAG" HEAD 2>/dev/null | grep -q "^\.github/workflows/"; then
+            echo "has-changes=true" >> "$GITHUB_OUTPUT"
+            echo "Workflow files changed - skipping major version tag update"
+          else
+            echo "has-changes=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update Major Version Tag
-        if: steps.version.outputs.version != ''
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        if: steps.version.outputs.version != '' && steps.workflow-changes.outputs.has-changes != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git tag -fa "v${{ steps.version.outputs.major }}" -m "Update v${{ steps.version.outputs.major }} to v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.major }}" --force
