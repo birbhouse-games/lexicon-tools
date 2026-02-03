@@ -244,9 +244,11 @@ jobs:
 
       - name: Update Major Version Tag
         if: steps.version.outputs.version != ''
-        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
           git tag -fa "v${{ steps.version.outputs.major }}" -m "Update v${{ steps.version.outputs.major }} to v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.major }}" --force
