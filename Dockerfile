@@ -1,5 +1,5 @@
 # Container action for ATProto lexicon operations using goat CLI
-FROM alpine:3.21
+FROM alpine:3.23
 
 # Install dependencies
 # hadolint ignore=DL3018
