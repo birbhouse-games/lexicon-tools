@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/birbhouse-games/lexicon-tools/compare/v1.1.1...v1.1.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* **check-dns:** Use correct --example-did flag for goat CLI ([0232b1a](https://github.com/birbhouse-games/lexicon-tools/commit/0232b1af46a8a0322997889a34b0e61e12a36bac))
+
 ## [1.1.1](https://github.com/birbhouse-games/lexicon-tools/compare/v1.1.0...v1.1.1) (2026-02-03)
 
 
