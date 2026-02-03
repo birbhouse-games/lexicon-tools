@@ -15,10 +15,14 @@ inputs:
     description: Output results in JSON format
     required: false
     default: 'false'
-  fail-on-warning:
-    description: Fail the action if warnings are found
+  failure-threshold:
+    description: |
+      When to fail the action. One of:
+      - error: Only fail if errors are found (default)
+      - warning: Fail if warnings or errors are found
+      - none: Never fail (just report results)
     required: false
-    default: 'false'
+    default: 'error'
 
 outputs:
   result:
@@ -35,4 +39,4 @@ runs:
     INPUT_COMMAND: lint
     INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
     INPUT_JSON_OUTPUT: ${{ inputs.json-output }}
-    INPUT_FAIL_ON_WARNING: ${{ inputs.fail-on-warning }}
+    INPUT_FAILURE_THRESHOLD: ${{ inputs.failure-threshold }}

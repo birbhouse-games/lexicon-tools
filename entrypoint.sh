@@ -38,7 +38,7 @@ COMMAND="${INPUT_COMMAND:-lint}"
 LEXICON_PATH="${INPUT_LEXICON_PATH:-.}"
 DID="${INPUT_DID:-}"
 JSON_OUTPUT="${INPUT_JSON_OUTPUT:-false}"
-FAIL_ON_WARNING="${INPUT_FAIL_ON_WARNING:-false}"
+FAILURE_THRESHOLD="${INPUT_FAILURE_THRESHOLD:-error}"
 UPDATE="${INPUT_UPDATE:-false}"
 SKIP_DNS_CHECK="${INPUT_SKIP_DNS_CHECK:-false}"
 
@@ -99,17 +99,42 @@ case "$COMMAND" in
 
         echo "::endgroup::"
 
-        if [ "$HAS_ERRORS" = "true" ]; then
-            EXIT_CODE=1
-            error "Lint check found errors"
-        elif [ "$HAS_WARNINGS" = "true" ] && [ "$FAIL_ON_WARNING" = "true" ]; then
-            EXIT_CODE=1
-            error "Lint check found warnings (fail-on-warning is enabled)"
-        elif [ "$HAS_WARNINGS" = "true" ]; then
-            warning "Lint check found warnings"
-        else
-            notice "Lint check passed"
-        fi
+        # Determine exit behavior based on failure-threshold
+        case "$FAILURE_THRESHOLD" in
+            none)
+                # Never fail, just report results
+                if [ "$HAS_ERRORS" = "true" ]; then
+                    warning "Lint check found errors (failure-threshold: none)"
+                elif [ "$HAS_WARNINGS" = "true" ]; then
+                    warning "Lint check found warnings"
+                else
+                    notice "Lint check passed"
+                fi
+                ;;
+            warning)
+                # Fail on warnings or errors
+                if [ "$HAS_ERRORS" = "true" ]; then
+                    EXIT_CODE=1
+                    error "Lint check found errors"
+                elif [ "$HAS_WARNINGS" = "true" ]; then
+                    EXIT_CODE=1
+                    error "Lint check found warnings (failure-threshold: warning)"
+                else
+                    notice "Lint check passed"
+                fi
+                ;;
+            error|*)
+                # Default: only fail on errors
+                if [ "$HAS_ERRORS" = "true" ]; then
+                    EXIT_CODE=1
+                    error "Lint check found errors"
+                elif [ "$HAS_WARNINGS" = "true" ]; then
+                    warning "Lint check found warnings"
+                else
+                    notice "Lint check passed"
+                fi
+                ;;
+        esac
         ;;
 
     breaking)
