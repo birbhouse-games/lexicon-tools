@@ -11,9 +11,6 @@ inputs:
     description: Path to the directory containing lexicon files
     required: false
     default: '.'
-  did:
-    description: DID to verify DNS records against
-    required: true
 
 outputs:
   result:
@@ -23,8 +20,6 @@ outputs:
 
 runs:
   using: docker
-  image: ../Dockerfile
+  image: Dockerfile
   env:
-    INPUT_COMMAND: check-dns
     INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
-    INPUT_DID: ${{ inputs.did }}

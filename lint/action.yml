@@ -34,9 +34,8 @@ outputs:
 
 runs:
   using: docker
-  image: ../Dockerfile
+  image: Dockerfile
   env:
-    INPUT_COMMAND: lint
     INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
     INPUT_JSON_OUTPUT: ${{ inputs.json-output }}
     INPUT_FAILURE_THRESHOLD: ${{ inputs.failure-threshold }}

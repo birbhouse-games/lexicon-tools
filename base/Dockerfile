@@ -1,4 +1,4 @@
-# Container action for ATProto lexicon operations using goat CLI
+# Base image for ATProto lexicon operations using goat CLI
 FROM alpine:3.23
 
 # Install dependencies
@@ -21,10 +21,3 @@ RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "x86_64") && \
 
 # Set the working directory
 WORKDIR /github/workspace
-
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Configure the container to be run as an executable
-ENTRYPOINT ["/entrypoint.sh"]

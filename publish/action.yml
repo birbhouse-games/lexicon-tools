@@ -34,9 +34,8 @@ outputs:
 
 runs:
   using: docker
-  image: ../Dockerfile
+  image: Dockerfile
   env:
-    INPUT_COMMAND: publish
     INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
     GOAT_USERNAME: ${{ inputs.username }}
     GOAT_PASSWORD: ${{ inputs.password }}

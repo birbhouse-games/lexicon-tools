@@ -20,7 +20,6 @@ outputs:
 
 runs:
   using: docker
-  image: ../Dockerfile
+  image: Dockerfile
   env:
-    INPUT_COMMAND: status
     INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
