@@ -82,9 +82,9 @@ case "$COMMAND" in
             HAS_WARNINGS=$(echo "$RESULT" | jq 'any(."lint-level" | . == "warning")' 2>/dev/null || echo "false")
         else
             # shellcheck disable=SC2086
-            if ! RESULT=$(goat lex lint $LEXICON_ARGS 2>&1); then
-                HAS_ERRORS="true"
-            fi
+            # Note: goat lint may return non-zero for any issues (warnings or errors)
+            # so we ignore the exit code and check the output content instead
+            RESULT=$(goat lex lint $LEXICON_ARGS 2>&1) || true
             echo "$RESULT"
 
             # Check for warnings in text output (yellow circle)
