@@ -1,0 +1,36 @@
+name: ATProto Lexicon Tools
+description: |
+  A collection of GitHub Actions for working with ATProto lexicons using the official goat CLI.
+
+  Available actions:
+  - birbhouse-games/lexicon-tools/lint@v1 - Lint lexicon files for syntax and style issues
+  - birbhouse-games/lexicon-tools/breaking@v1 - Check for breaking changes against the network
+  - birbhouse-games/lexicon-tools/check-dns@v1 - Verify DNS records for lexicon namespaces
+  - birbhouse-games/lexicon-tools/status@v1 - Check local lexicon status against the network
+  - birbhouse-games/lexicon-tools/publish@v1 - Publish lexicons to the ATProto network
+
+  See the README for usage examples: https://github.com/birbhouse-games/lexicon-tools
+author: Birbhouse Games, LLC
+
+branding:
+  icon: package
+  color: blue
+
+runs:
+  using: composite
+  steps:
+    - name: Usage Information
+      shell: bash
+      run: |
+        echo "ATProto Lexicon Tools"
+        echo "====================="
+        echo ""
+        echo "This is a collection of actions. Please use one of the following:"
+        echo ""
+        echo "  - birbhouse-games/lexicon-tools/lint@v1"
+        echo "  - birbhouse-games/lexicon-tools/breaking@v1"
+        echo "  - birbhouse-games/lexicon-tools/check-dns@v1"
+        echo "  - birbhouse-games/lexicon-tools/status@v1"
+        echo "  - birbhouse-games/lexicon-tools/publish@v1"
+        echo ""
+        echo "See: https://github.com/birbhouse-games/lexicon-tools"
