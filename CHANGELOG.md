@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/birbhouse-games/lexicon-tools/compare/v1.0.0...v1.1.0) (2026-02-03)
+
+
+### Features
+
+* **lint:** Add configurable failure-threshold option ([d0f37ef](https://github.com/birbhouse-games/lexicon-tools/commit/d0f37efdbca28e967e65a04368ee89ffb19466c9))
+
 # 1.0.0 (2026-02-03)
 
 
