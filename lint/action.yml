@@ -1,0 +1,38 @@
+name: Lint ATProto Lexicons
+description: Lint lexicon files for syntax and style issues using the goat CLI
+author: Birbhouse Games, LLC
+
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  lexicon-path:
+    description: Path to the directory containing lexicon files
+    required: false
+    default: '.'
+  json-output:
+    description: Output results in JSON format
+    required: false
+    default: 'false'
+  fail-on-warning:
+    description: Fail the action if warnings are found
+    required: false
+    default: 'false'
+
+outputs:
+  result:
+    description: The raw output from the goat command
+  has-errors:
+    description: Whether errors were found (true/false)
+  has-warnings:
+    description: Whether warnings were found (true/false)
+
+runs:
+  using: docker
+  image: ../Dockerfile
+  env:
+    INPUT_COMMAND: lint
+    INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
+    INPUT_JSON_OUTPUT: ${{ inputs.json-output }}
+    INPUT_FAIL_ON_WARNING: ${{ inputs.fail-on-warning }}

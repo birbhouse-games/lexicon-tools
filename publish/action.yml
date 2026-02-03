@@ -1,0 +1,44 @@
+name: Publish ATProto Lexicons
+description: Publish lexicon schemas to the ATProto network using the goat CLI
+author: Birbhouse Games, LLC
+
+branding:
+  icon: upload-cloud
+  color: blue
+
+inputs:
+  lexicon-path:
+    description: Path to the directory containing lexicon files
+    required: false
+    default: '.'
+  username:
+    description: ATProto account identifier (handle or DID) for authentication
+    required: true
+  password:
+    description: ATProto app password for authentication (use GitHub secrets)
+    required: true
+  update:
+    description: Update existing schema records if they differ
+    required: false
+    default: 'false'
+  skip-dns-check:
+    description: Skip NSID DNS resolution match requirement
+    required: false
+    default: 'false'
+
+outputs:
+  result:
+    description: The raw output from the goat command
+  has-errors:
+    description: Whether publishing failed (true/false)
+
+runs:
+  using: docker
+  image: ../Dockerfile
+  env:
+    INPUT_COMMAND: publish
+    INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
+    GOAT_USERNAME: ${{ inputs.username }}
+    GOAT_PASSWORD: ${{ inputs.password }}
+    INPUT_UPDATE: ${{ inputs.update }}
+    INPUT_SKIP_DNS_CHECK: ${{ inputs.skip-dns-check }}

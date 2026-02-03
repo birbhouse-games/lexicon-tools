@@ -1,0 +1,19 @@
+# Logs
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea
+*.code-workspace
+.vscode
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test lexicons (created during CI)
+lexicons/

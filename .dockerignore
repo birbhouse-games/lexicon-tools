@@ -1,0 +1,32 @@
+# Git
+.git
+.gitattributes
+.gitignore
+
+# Documentation
+*.md
+docs
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.claude
+
+# CI/CD configuration
+.github
+.checkov.yml
+.markdown-lint.yml
+.yaml-lint.yml
+actionlint.yml
+.releaserc.json
+
+# Development
+.devcontainer
+
+# License file (not needed in container runtime)
+LICENSE
+
+# Changelog
+CHANGELOG.md

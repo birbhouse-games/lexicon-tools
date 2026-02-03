@@ -1,0 +1,30 @@
+name: Check Lexicon DNS Records
+description: Verify DNS records are configured for ATProto lexicon namespaces using the goat CLI
+author: Birbhouse Games, LLC
+
+branding:
+  icon: globe
+  color: green
+
+inputs:
+  lexicon-path:
+    description: Path to the directory containing lexicon files
+    required: false
+    default: '.'
+  did:
+    description: DID to verify DNS records against
+    required: true
+
+outputs:
+  result:
+    description: The raw output from the goat command
+  has-errors:
+    description: Whether DNS check failed (true/false)
+
+runs:
+  using: docker
+  image: ../Dockerfile
+  env:
+    INPUT_COMMAND: check-dns
+    INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
+    INPUT_DID: ${{ inputs.did }}

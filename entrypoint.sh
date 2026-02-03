@@ -1,0 +1,214 @@
+#!/bin/bash
+set -e
+
+# Function to output to GitHub Actions
+output() {
+    echo "$1=$2" >> "$GITHUB_OUTPUT"
+}
+
+# Function to set error message and exit
+error() {
+    echo "::error::$1"
+    exit 1
+}
+
+# Function to set warning message
+warning() {
+    echo "::warning::$1"
+}
+
+# Function to output notice
+notice() {
+    echo "::notice::$1"
+}
+
+# Print goat version
+echo "Using goat version: $(goat -v)"
+
+# Get inputs from environment variables (set by GitHub Actions)
+COMMAND="${INPUT_COMMAND:-lint}"
+LEXICON_PATH="${INPUT_LEXICON_PATH:-.}"
+DID="${INPUT_DID:-}"
+JSON_OUTPUT="${INPUT_JSON_OUTPUT:-false}"
+FAIL_ON_WARNING="${INPUT_FAIL_ON_WARNING:-false}"
+UPDATE="${INPUT_UPDATE:-false}"
+SKIP_DNS_CHECK="${INPUT_SKIP_DNS_CHECK:-false}"
+
+# Validate command
+case "$COMMAND" in
+    lint|breaking|check-dns|status|publish)
+        ;;
+    *)
+        error "Invalid command: $COMMAND. Must be one of: lint, breaking, check-dns, status, publish"
+        ;;
+esac
+
+# Change to lexicon path if specified
+if [ -n "$LEXICON_PATH" ] && [ "$LEXICON_PATH" != "." ]; then
+    if [ ! -d "$LEXICON_PATH" ]; then
+        error "Lexicon path does not exist: $LEXICON_PATH"
+    fi
+    cd "$LEXICON_PATH"
+fi
+
+echo "Running goat lex $COMMAND in $(pwd)"
+
+# Initialize result variables
+EXIT_CODE=0
+RESULT=""
+HAS_ERRORS="false"
+HAS_WARNINGS="false"
+HAS_CHANGES="false"
+
+case "$COMMAND" in
+    lint)
+        echo "::group::Linting lexicon files"
+
+        if [ "$JSON_OUTPUT" = "true" ]; then
+            RESULT=$(goat lex lint --json 2>&1 | jq --slurp '.' || echo "[]")
+            echo "$RESULT" | jq '.'
+
+            # Check for errors in JSON output
+            HAS_ERRORS=$(echo "$RESULT" | jq 'any(."lint-level" | . == "error")' 2>/dev/null || echo "false")
+            HAS_WARNINGS=$(echo "$RESULT" | jq 'any(."lint-level" | . == "warning")' 2>/dev/null || echo "false")
+        else
+            if ! RESULT=$(goat lex lint 2>&1); then
+                HAS_ERRORS="true"
+            fi
+            echo "$RESULT"
+
+            # Check for warnings in text output (yellow circle)
+            if echo "$RESULT" | grep -q "🟡"; then
+                HAS_WARNINGS="true"
+            fi
+            # Check for errors in text output (red circle)
+            if echo "$RESULT" | grep -q "🔴"; then
+                HAS_ERRORS="true"
+            fi
+        fi
+
+        echo "::endgroup::"
+
+        if [ "$HAS_ERRORS" = "true" ]; then
+            EXIT_CODE=1
+            error "Lint check found errors"
+        elif [ "$HAS_WARNINGS" = "true" ] && [ "$FAIL_ON_WARNING" = "true" ]; then
+            EXIT_CODE=1
+            error "Lint check found warnings (fail-on-warning is enabled)"
+        elif [ "$HAS_WARNINGS" = "true" ]; then
+            warning "Lint check found warnings"
+        else
+            notice "Lint check passed"
+        fi
+        ;;
+
+    breaking)
+        echo "::group::Checking for breaking changes"
+
+        if ! RESULT=$(goat lex breaking 2>&1); then
+            HAS_ERRORS="true"
+            EXIT_CODE=1
+        fi
+        echo "$RESULT"
+
+        echo "::endgroup::"
+
+        if [ "$HAS_ERRORS" = "true" ]; then
+            error "Breaking changes detected"
+        else
+            notice "No breaking changes detected"
+        fi
+        ;;
+
+    check-dns)
+        if [ -z "$DID" ]; then
+            error "DID is required for check-dns command"
+        fi
+
+        echo "::group::Checking DNS records for DID: $DID"
+
+        if ! RESULT=$(goat lex check-dns --did "$DID" 2>&1); then
+            HAS_ERRORS="true"
+            EXIT_CODE=1
+        fi
+        echo "$RESULT"
+
+        echo "::endgroup::"
+
+        if [ "$HAS_ERRORS" = "true" ]; then
+            error "DNS check failed"
+        else
+            notice "DNS check passed"
+        fi
+        ;;
+
+    status)
+        echo "::group::Checking lexicon status against network"
+
+        if ! RESULT=$(goat lex status 2>&1); then
+            HAS_CHANGES="true"
+        fi
+        echo "$RESULT"
+
+        # Check for status indicators showing changes
+        if echo "$RESULT" | grep -qE "🟡|🔴|🟠|🟣"; then
+            HAS_CHANGES="true"
+        fi
+
+        echo "::endgroup::"
+
+        if [ "$HAS_CHANGES" = "true" ]; then
+            notice "Lexicon status check found differences from network"
+        else
+            notice "Lexicons are in sync with network"
+        fi
+        ;;
+
+    publish)
+        # Validate credentials
+        if [ -z "$GOAT_USERNAME" ]; then
+            error "Username is required for publish command"
+        fi
+        if [ -z "$GOAT_PASSWORD" ]; then
+            error "Password is required for publish command"
+        fi
+
+        # Mask password in logs
+        echo "::add-mask::$GOAT_PASSWORD"
+
+        echo "::group::Publishing lexicons"
+
+        # Build command arguments
+        PUBLISH_ARGS=""
+        if [ "$UPDATE" = "true" ]; then
+            PUBLISH_ARGS="$PUBLISH_ARGS --update"
+        fi
+        if [ "$SKIP_DNS_CHECK" = "true" ]; then
+            PUBLISH_ARGS="$PUBLISH_ARGS --skip-dns-check"
+        fi
+
+        # Run publish command
+        # shellcheck disable=SC2086
+        if ! RESULT=$(goat lex publish $PUBLISH_ARGS 2>&1); then
+            HAS_ERRORS="true"
+            EXIT_CODE=1
+        fi
+        echo "$RESULT"
+
+        echo "::endgroup::"
+
+        if [ "$HAS_ERRORS" = "true" ]; then
+            error "Publishing failed"
+        else
+            notice "Publishing completed successfully"
+        fi
+        ;;
+esac
+
+# Set outputs
+output "result" "$RESULT"
+output "has-errors" "$HAS_ERRORS"
+output "has-warnings" "$HAS_WARNINGS"
+output "has-changes" "$HAS_CHANGES"
+
+exit $EXIT_CODE

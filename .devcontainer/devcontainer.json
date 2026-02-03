@@ -1,0 +1,35 @@
+{
+	"name": "ATProto Lexicon Tools",
+	"image": "mcr.microsoft.com/devcontainers/base:alpine",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"postCreateCommand": "docker build -t lexicon-tools:dev .",
+	"customizations": {
+		"codespaces": {
+			"openFiles": ["README.md"]
+		},
+		"vscode": {
+			"extensions": [
+				"bierner.markdown-preview-github-styles",
+				"davidanson.vscode-markdownlint",
+				"github.copilot",
+				"github.copilot-chat",
+				"github.vscode-github-actions",
+				"github.vscode-pull-request-github",
+				"ms-azuretools.vscode-docker",
+				"redhat.vscode-yaml",
+				"timonwong.shellcheck",
+				"yzhang.markdown-all-in-one"
+			],
+			"settings": {
+				"editor.tabSize": 2,
+				"editor.formatOnSave": true
+			}
+		}
+	},
+	"remoteEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+	}
+}

@@ -1,0 +1,26 @@
+name: Check Lexicon Breaking Changes
+description: Check for breaking changes in ATProto lexicons using the goat CLI
+author: Birbhouse Games, LLC
+
+branding:
+  icon: alert-triangle
+  color: yellow
+
+inputs:
+  lexicon-path:
+    description: Path to the directory containing lexicon files
+    required: false
+    default: '.'
+
+outputs:
+  result:
+    description: The raw output from the goat command
+  has-errors:
+    description: Whether breaking changes were found (true/false)
+
+runs:
+  using: docker
+  image: ../Dockerfile
+  env:
+    INPUT_COMMAND: breaking
+    INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}

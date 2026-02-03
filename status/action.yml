@@ -1,0 +1,26 @@
+name: Check Lexicon Status
+description: Check the status of local lexicons against the ATProto network using the goat CLI
+author: Birbhouse Games, LLC
+
+branding:
+  icon: activity
+  color: purple
+
+inputs:
+  lexicon-path:
+    description: Path to the directory containing lexicon files
+    required: false
+    default: '.'
+
+outputs:
+  result:
+    description: The raw output from the goat command
+  has-changes:
+    description: Whether there are differences from the network (true/false)
+
+runs:
+  using: docker
+  image: ../Dockerfile
+  env:
+    INPUT_COMMAND: status
+    INPUT_LEXICON_PATH: ${{ inputs.lexicon-path }}
