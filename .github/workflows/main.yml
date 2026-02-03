@@ -45,7 +45,7 @@ jobs:
 
       - name: Test goat installation
         run: |
-          docker run --rm lexicon-tools:test goat -v
+          docker run --rm --entrypoint goat lexicon-tools:test -v
 
   # Test all actions with sample lexicons
   test-actions:
@@ -208,8 +208,8 @@ jobs:
         run: |
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "")
           if [ -n "$VERSION" ]; then
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "major=$(echo $VERSION | cut -d. -f1)" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "major=$(echo "$VERSION" | cut -d. -f1)" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update Major Version Tag

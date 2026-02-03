@@ -2,6 +2,7 @@
 FROM alpine:3.21
 
 # Install dependencies
+# hadolint ignore=DL3018
 RUN apk add --no-cache \
     bash \
     curl \
