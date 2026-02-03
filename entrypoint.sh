@@ -43,15 +43,12 @@ case "$COMMAND" in
         ;;
 esac
 
-# Change to lexicon path if specified
-if [ -n "$LEXICON_PATH" ] && [ "$LEXICON_PATH" != "." ]; then
-    if [ ! -d "$LEXICON_PATH" ]; then
-        error "Lexicon path does not exist: $LEXICON_PATH"
-    fi
-    cd "$LEXICON_PATH"
+# Validate lexicon path exists
+if [ ! -d "$LEXICON_PATH" ]; then
+    error "Lexicon path does not exist: $LEXICON_PATH"
 fi
 
-echo "Running goat lex $COMMAND in $(pwd)"
+echo "Running goat lex $COMMAND with lexicons from: $LEXICON_PATH"
 
 # Initialize result variables
 EXIT_CODE=0
@@ -60,19 +57,24 @@ HAS_ERRORS="false"
 HAS_WARNINGS="false"
 HAS_CHANGES="false"
 
+# Common args for lexicon directory
+LEXICON_ARGS="--lexicons-dir=$LEXICON_PATH"
+
 case "$COMMAND" in
     lint)
         echo "::group::Linting lexicon files"
 
         if [ "$JSON_OUTPUT" = "true" ]; then
-            RESULT=$(goat lex lint --json 2>&1 | jq --slurp '.' || echo "[]")
+            # shellcheck disable=SC2086
+            RESULT=$(goat lex lint $LEXICON_ARGS --json 2>&1 | jq --slurp '.' || echo "[]")
             echo "$RESULT" | jq '.'
 
             # Check for errors in JSON output
             HAS_ERRORS=$(echo "$RESULT" | jq 'any(."lint-level" | . == "error")' 2>/dev/null || echo "false")
             HAS_WARNINGS=$(echo "$RESULT" | jq 'any(."lint-level" | . == "warning")' 2>/dev/null || echo "false")
         else
-            if ! RESULT=$(goat lex lint 2>&1); then
+            # shellcheck disable=SC2086
+            if ! RESULT=$(goat lex lint $LEXICON_ARGS 2>&1); then
                 HAS_ERRORS="true"
             fi
             echo "$RESULT"
@@ -105,7 +107,8 @@ case "$COMMAND" in
     breaking)
         echo "::group::Checking for breaking changes"
 
-        if ! RESULT=$(goat lex breaking 2>&1); then
+        # shellcheck disable=SC2086
+        if ! RESULT=$(goat lex breaking $LEXICON_ARGS 2>&1); then
             HAS_ERRORS="true"
             EXIT_CODE=1
         fi
@@ -127,7 +130,8 @@ case "$COMMAND" in
 
         echo "::group::Checking DNS records for DID: $DID"
 
-        if ! RESULT=$(goat lex check-dns --did "$DID" 2>&1); then
+        # shellcheck disable=SC2086
+        if ! RESULT=$(goat lex check-dns $LEXICON_ARGS --did "$DID" 2>&1); then
             HAS_ERRORS="true"
             EXIT_CODE=1
         fi
@@ -145,7 +149,8 @@ case "$COMMAND" in
     status)
         echo "::group::Checking lexicon status against network"
 
-        if ! RESULT=$(goat lex status 2>&1); then
+        # shellcheck disable=SC2086
+        if ! RESULT=$(goat lex status $LEXICON_ARGS 2>&1); then
             HAS_CHANGES="true"
         fi
         echo "$RESULT"
@@ -179,7 +184,7 @@ case "$COMMAND" in
         echo "::group::Publishing lexicons"
 
         # Build command arguments
-        PUBLISH_ARGS=""
+        PUBLISH_ARGS="$LEXICON_ARGS"
         if [ "$UPDATE" = "true" ]; then
             PUBLISH_ARGS="$PUBLISH_ARGS --update"
         fi
